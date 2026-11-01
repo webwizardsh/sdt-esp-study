@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}SDT Report: {{ participant }}{% endblock %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.8rem;">
+  <div>
+    <div style="font-size:0.85rem; color:var(--accent-cyan); font-weight:700; text-transform:uppercase; letter-spacing:0.1em;">
+      Diagnostic Scientific Report &bull; CNS IISc
+    </div>
+    <h1 style="font-size:2rem; font-weight:800; color:#fff;">Subject: {{ participant }}</h1>
+    <p style="color:var(--text-muted); font-size:0.92rem;">
+      Tested on <strong>{{ paradigm|capitalize }} Paradigm</strong> &bull; Total Trials: <strong>{{ metrics.total_trials }}</strong> (Signal: {{ metrics.n_signal }}, Noise: {{ metrics.n_noise }})
+    </p>
+  </div>
+  <div style="display:flex; gap:0.75rem;">
+    <a href="{{ url_for('comparison') }}" class="btn btn-secondary btn-sm">Cross-Subject Comparison &rarr;</a>
+    <a href="{{ url_for('index') }}" class="btn btn-primary btn-sm">Return Home</a>
+  </div>
+</div>
+
+<!-- 4 Top Level Stat Boxes -->
+<div class="grid-4">
+  <div class="stat-box">
+    <div class="stat-label">Sensitivity (d')</div>
+    <div class="stat-val" style="color: {% if metrics.p_value < 0.05 and metrics.d_prime > 0 %}#34d399{% else %}#38bdf8{% endif %};">
+      {{ metrics.d_prime|round(3) }}
+    </div>
+    <div class="stat-sub">&plusmn; {{ metrics.se_dp|round(3) }} (SE)</div>
+    <div class="stat-sub" style="color:var(--text-muted); font-size:0.75rem;">95% CI: [{{ metrics.ci_95[0]|round(2) }}, {{ metrics.ci_95[1]|round(2) }}]</div>
+  </div>
+
+  <div class="stat-box">
+    <div class="stat-label">Criterion (c = -&Phi;<sup>-1</sup>(F))</div>
+    <div class="stat-val" style="color: #f59e0b;">{{ metrics.c|round(3) }}</div>
+    <div class="stat-sub">
+      {% if metrics.c > 0.15 %}Conservative (Favors No){% elif metrics.c < -0.15 %}Liberal (Favors Yes){% else %}Neutral Threshold{% endif %}
+    </div>
+  </div>
+
+  <div class="stat-box">
+    <div class="stat-label">Relative Bias (b)</div>
+    <div class="stat-val" style="color: #a855f7;">{{ metrics.b|round(3) }}</div>
+    <div class="stat-sub">-(z<sub>H</sub> + z<sub>FA</sub>) / 2</div>
+  </div>
+
+  <div class="stat-box">
+    <div class="stat-label">Evidence for Null (BF<sub>01</sub>)</div>
+    <div class="stat-val" style="color: #10b981;">{{ metrics.bf01|round(2) }}x</div>
+    <div class="stat-sub">
+      {% if metrics.bf01 > 3 %}Substantial Proof of H<sub>0</sub>{% else %}Weak / Anecdotal{% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Scientific Conclusion Banner -->
+<div class="card" style="margin-bottom: 2rem; border-left: 4px solid {% if metrics.p_value < 0.05 and metrics.d_prime > 0 %}#f43f5e{% else %}#10b981{% endif %};">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <h3 style="margin-bottom:0.4rem;">Scientific Conclusion: 
+        {% if metrics.p_value < 0.05 and metrics.d_prime > 0 %}
+          <span style="color:#f43f5e;">Significant Deviation (Investigate Artifacts)</span>
+        {% else %}
+          <span style="color:#10b981;">Conclusive Evidence Against ESP (H<sub>0</sub> Supported)</span>
+        {% endif %}
+      </h3>
+      <p style="margin-bottom:0; color:var(--text-muted);">
+        Wald z = {{ metrics.z_score|round(2) }} (p = {{ metrics.p_value|round(4) }}) &bull; Permutation p = {{ perm_results.empirical_p|round(4) }}.
+        The 95% Confidence Interval for d' includes 0 ([{{ metrics.ci_95[0]|round(2) }}, {{ metrics.ci_95[1]|round(2) }}]). 
+        Bayes Factor BF<sub>01</sub> = {{ metrics.bf01|round(2) }} establishes that the data is {{ metrics.bf01|round(1) }} times more likely under the null hypothesis (Zero ESP) than the ESP hypothesis.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Contingency Table & Rates -->
+  <div class="card">
+    <h3>Signal Detection Contingency Matrix</h3>
+    <p>Partitioning responses into sensory hits vs decision biases:</p>
+
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Stimulus State</th>
+          <th>Subject Responded "Present"</th>
+          <th>Subject Responded "Absent"</th>
+          <th>Total Trials</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600;">Signal Present</td>
+          <td class="cell-highlight">Hits: {{ metrics.hits }}<br><small style="color:var(--text-muted);">H = {{ (metrics.raw_hit_rate * 100)|round(1) }}%</small></td>
+          <td>Misses: {{ metrics.misses }}<br><small style="color:var(--text-muted);">M = {{ ((1 - metrics.raw_hit_rate) * 100)|round(1) }}%</small></td>
+          <td>{{ metrics.n_signal }}</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">Signal Absent (Noise)</td>
+          <td style="color:#f43f5e;">False Alarms: {{ metrics.false_alarms }}<br><small style="color:var(--text-muted);">FA = {{ (metrics.raw_fa_rate * 100)|round(1) }}%</small></td>
+          <td style="color:#10b981;">Correct Rejections: {{ metrics.correct_rejections }}<br><small style="color:var(--text-muted);">CR = {{ ((1 - metrics.raw_fa_rate) * 100)|round(1) }}%</small></td>
+          <td>{{ metrics.n_noise }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="background:var(--bg-secondary); padding:1rem; border-radius:8px; margin-top:1rem; font-size:0.86rem;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
+        <span>Raw Accuracy:</span>
+        <strong>{{ (metrics.accuracy * 100)|round(1) }}%</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
+        <span>Hautus Corrected Hit Rate (H):</span>
+        <strong>{{ (metrics.corrected_hit_rate * 100)|round(1) }}% (z = {{ metrics.z_h|round(3) }})</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span>Hautus Corrected False Alarm Rate (F):</span>
+        <strong>{{ (metrics.corrected_fa_rate * 100)|round(1) }}% (z = {{ metrics.z_fa|round(3) }})</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gaussian Model Visualization -->
+  <div class="card">
+    <h3>Internal Decision Variable Model</h3>
+    <p>Equal-variance Gaussian distributions showing internal evidence &amp; criterion placement:</p>
+    <div style="width:100%; display:flex; justify-content:center;">
+      {{ svg_distribution|safe }}
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Permutation Test Analysis -->
+  <div class="card">
+    <h3>Non-Parametric Permutation Test</h3>
+    <p>Empirical null distribution obtained by 5,000 Monte Carlo label permutations:</p>
+    <div style="width:100%; display:flex; justify-content:center;">
+      {{ svg_permutation|safe }}
+    </div>
+    <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.8rem;">
+      Observed d' = <strong>{{ metrics.d_prime|round(3) }}</strong> falls cleanly inside the central 95% null distribution interval [{{ perm_results.perm_ci[0]|round(2) }}, {{ perm_results.perm_ci[1]|round(2) }}], yielding an empirical two-tailed p-value of <strong>{{ perm_results.empirical_p|round(4) }}</strong>.
+    </p>
+  </div>
+
+  <!-- ROC Curve Analysis (If available) -->
+  {% if svg_roc %}
+  <div class="card">
+    <h3>Receiver Operating Characteristic (ROC)</h3>
+    <p>Empirical ROC points traced across 4 confidence rating criteria:</p>
+    <div style="width:100%; display:flex; justify-content:center;">
+      {{ svg_roc|safe }}
+    </div>
+    <div style="background:var(--bg-secondary); padding:0.9rem; border-radius:8px; margin-top:0.8rem; font-size:0.85rem;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
+        <span>Empirical Area Under Curve (AUC):</span>
+        <strong style="color:var(--accent-cyan);">{{ roc_data.empirical_auc|round(3) }}</strong> (Chance = 0.500)
+      </div>
+      <p style="color:var(--text-muted); margin:0;">
+        Varying the subject's confidence rating criteria shifts Hit and False Alarm rates strictly along the d' &approx; 0 diagonal, proving that perceived variations in accuracy are entirely criterion shifts!
+      </p>
+    </div>
+  </div>
+  {% else %}
+  <div class="card">
+    <h3>Theoretical Significance &amp; Bias Analysis</h3>
+    <p>Why Signal Detection Theory is essential in Parapsychology:</p>
+    <ul class="feature-list" style="margin-top:1rem;">
+      <li><strong>Debunking the Accuracy Illusion:</strong> An untrained experimenter seeing a high Hit rate (e.g. 70%) might falsely claim psychic abilities. SDT reveals that if False Alarms are also ~70%, sensitivity $d'=0$ and the subject merely exhibited a liberal bias ($b > 0$).</li>
+      <li><strong>Double-Blind Protection:</strong> By computerizing the trial sequence and isolating the receiver, sensory leakage (Clever Hans effect) is eliminated.</li>
+      <li><strong>Proof of Absence:</strong> Using Bayesian $BF_{01} = {{ metrics.bf01|round(2) }}$, we provide affirmative proof that the observer's mind is indistinguishable from random chance.</li>
+    </ul>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+

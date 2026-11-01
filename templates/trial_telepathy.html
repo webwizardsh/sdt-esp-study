@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Telepathy Trial {{ trial_num }}/{{ total }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 680px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+    <div>
+      <span class="badge badge-neutral">Subject: {{ participant }}</span>
+      <span class="badge badge-neutral" style="margin-left: 0.5rem;">Telepathy Paradigm</span>
+    </div>
+    <div style="font-weight: 600; color: var(--accent-cyan);">
+      Trial {{ trial_num }} of {{ total }}
+    </div>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-bar" style="width: {{ (trial_num / total * 100)|round(1) }}%;"></div>
+  </div>
+
+  <!-- PHASE 1: SENDER INSTRUCTION VIEW (Experimenter / Sender) -->
+  <div id="sender-card" class="card" style="text-align: center; padding: 2.5rem 1.5rem; border: 2px dashed #38bdf8;">
+    <div style="display: inline-block; background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem;">
+      Step 1 &bull; Sender's Confidential Cue (Receiver must NOT look)
+    </div>
+
+    {% if is_signal == 1 %}
+      <div style="background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+        <div style="font-size: 1.1rem; font-weight: 800; color: #f43f5e; margin-bottom: 0.5rem;">
+          ⭐ TRANSMIT SIGNAL: STAR
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1rem;">
+          Focus your mind on the <strong>STAR</strong> symbol below. Mentally project this image to <strong>{{ participant }}</strong> for 3–5 seconds.
+        </p>
+        <div class="zener-symbol" style="margin: 0 auto;">
+          <svg width="65" height="65" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+      </div>
+    {% else %}
+      <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+        <div style="font-size: 1.1rem; font-weight: 800; color: #38bdf8; margin-bottom: 0.5rem;">
+          ⚪ NOISE TRIAL: DO NOT TRANSMIT (BLANK)
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1rem;">
+          Keep your mind calm and blank. Do <strong>NOT</strong> project any symbol or thought. Maintain neutral focus for 3–5 seconds.
+        </p>
+        <div class="zener-symbol" style="margin: 0 auto; background: #e2e8f0; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 2rem; color: #94a3b8;">—</span>
+        </div>
+      </div>
+    {% endif %}
+
+    <button type="button" onclick="showReceiverPhase()" class="btn btn-primary" style="max-width: 380px; margin: 0 auto;">
+      Transmission Done &rarr; Reveal Receiver Choice
+    </button>
+  </div>
+
+  <!-- PHASE 2: RECEIVER RESPONSE VIEW (Friend / Subject) -->
+  <div id="receiver-card" class="card" style="text-align: center; padding: 2.5rem 1.5rem; display: none;">
+    <div style="display: inline-block; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem;">
+      Step 2 &bull; Receiver Decision: {{ participant }}
+    </div>
+
+    <!-- Double blind icon -->
+    <div class="zener-symbol" style="margin: 1rem auto 1.5rem; background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px dashed #475569;">
+      <svg width="55" height="55" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+
+    <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: #fff;">
+      Did the sender transmit the mental STAR signal?
+    </h3>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem;">
+      Trust your immediate feeling. Choose whether a signal was transmitted or if it was blank noise:
+    </p>
+
+    <form action="{{ url_for('trial') }}" method="POST">
+      <div style="display: flex; gap: 1.2rem; justify-content: center; max-width: 440px; margin: 0 auto;">
+        <button type="submit" name="choice" value="0" class="btn btn-secondary" style="flex: 1; padding: 1.1rem; border-color: #475569; font-size: 1.05rem;">
+          ❌ Absent (Noise)
+        </button>
+        <button type="submit" name="choice" value="1" class="btn btn-primary" style="flex: 1; padding: 1.1rem; font-size: 1.05rem;">
+          ⭐ Present (Signal)
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function showReceiverPhase() {
+    document.getElementById('sender-card').style.display = 'none';
+    document.getElementById('receiver-card').style.display = 'block';
+  }
+</script>
+{% endblock %}

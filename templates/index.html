@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+  <div class="hero-subtitle">Centre for Neuroscience &bull; Assignment 2</div>
+  <h1>Testing Parapsychology with Signal Detection Theory</h1>
+  <p>Can you prove or disprove ESP using Signal Detection Theory? Traditional tests confuse response bias with perceptual sensitivity. Here we isolate true sensitivity ($d'$) and decision criteria ($c, b$) under rigorous sensory shielding.</p>
+</div>
+
+<div class="grid-2">
+  <!-- Paradigm A Card -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-tag">Paradigm A &bull; Subject 1</span>
+      <span class="badge badge-neutral">Binary Yes/No</span>
+    </div>
+    <h2>Mental Telepathy Experiment</h2>
+    <p>A Sender focuses on a hidden Zener target during randomized signal intervals. An acoustically & visually isolated Receiver decides whether mental signal transmission occurred.</p>
+    
+    <ul class="feature-list">
+      <li>Sensory shielding (Double-blind computer controlled)</li>
+      <li>50 Randomized trials (50% signal prevalence)</li>
+      <li>Calculates $d'$, criterion $c$, and relative bias $b$</li>
+      <li>Monte Carlo Permutation test &amp; Bayes Factor ($BF_{01}$)</li>
+    </ul>
+
+    <form action="{{ url_for('start_experiment') }}" method="POST">
+      <input type="hidden" name="paradigm" value="telepathy">
+      <div class="form-group">
+        <label for="name_a">Subject Name / Identifier</label>
+        <input type="text" id="name_a" name="participant_name" class="form-control" placeholder="e.g. Alice (Subject 1)" required value="Alice">
+      </div>
+      <div class="form-group">
+        <label for="trials_a">Total Trials</label>
+        <select name="total_trials" id="trials_a" class="form-control">
+          <option value="50" selected>50 Trials (Recommended for power)</option>
+          <option value="40">40 Trials</option>
+          <option value="20">20 Trials (Quick test)</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Launch Telepathy Experiment &rarr;</button>
+    </form>
+  </div>
+
+  <!-- Paradigm B Card -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-tag">Paradigm B &bull; Subject 2</span>
+      <span class="badge badge-neutral">Confidence Rating ROC</span>
+    </div>
+    <h2>Clairvoyance &amp; ROC Analysis</h2>
+    <p>Tests direct perception of cryptographically concealed targets. The subject uses a 4-point rating scale to map multiple decision criteria and construct an empirical ROC curve.</p>
+    
+    <ul class="feature-list">
+      <li>Hardware RNG cryptographic vault shielding</li>
+      <li>4-level confidence ratings (1: Sure Absent to 4: Sure Present)</li>
+      <li>Constructs empirical ROC curve &amp; calculates empirical AUC</li>
+      <li>Demonstrates that varying criteria traces the $d' \approx 0$ contour</li>
+    </ul>
+
+    <form action="{{ url_for('start_experiment') }}" method="POST">
+      <input type="hidden" name="paradigm" value="clairvoyance">
+      <div class="form-group">
+        <label for="name_b">Subject Name / Identifier</label>
+        <input type="text" id="name_b" name="participant_name" class="form-control" placeholder="e.g. Bob (Subject 2)" required value="Bob">
+      </div>
+      <div class="form-group">
+        <label for="trials_b">Total Trials</label>
+        <select name="total_trials" id="trials_b" class="form-control">
+          <option value="60" selected>60 Trials (Optimized for 4-point ROC)</option>
+          <option value="40">40 Trials</option>
+          <option value="20">20 Trials (Quick test)</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent-violet), #6d28d9);">Launch Clairvoyance ROC Experiment &rarr;</button>
+    </form>
+  </div>
+</div>
+
+<!-- Quick Demonstration / Standardized Study -->
+<div class="card" style="margin-bottom: 2.5rem; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+    <div>
+      <h3 style="margin-bottom:0.3rem;">⚡ Load Standardized Benchmark Experiment (n=2 Subjects)</h3>
+      <p style="margin-bottom:0; max-width:650px;">Generates reproducible, scientifically controlled datasets for Alice (Telepathy) and Bob (Clairvoyance ROC) with empirical permutation distributions and statistical proof.</p>
+    </div>
+    <div>
+      <form action="{{ url_for('load_demo_data') }}" method="POST" style="display:inline;">
+        <button type="submit" class="btn btn-emerald" style="width:auto; padding:0.8rem 1.6rem;">Initialize n=2 Dataset &rarr;</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Completed Experiments Section -->
+{% if experiments %}
+<div class="card">
+  <div class="card-header">
+    <h3>Completed Experimental Sessions ({{ experiments|length }} Recorded)</h3>
+    <a href="{{ url_for('comparison') }}" class="btn btn-secondary btn-sm">View Multi-Subject Comparison &rarr;</a>
+  </div>
+  
+  <table class="matrix-table">
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Paradigm</th>
+        <th>Trials</th>
+        <th>Accuracy</th>
+        <th>Hit Rate (H)</th>
+        <th>FA Rate (F)</th>
+        <th>Sensitivity (d')</th>
+        <th>Criterion (c)</th>
+        <th>Bias (b)</th>
+        <th>p-value</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for exp in experiments %}
+      <tr>
+        <td style="font-weight:600; text-align:left;">{{ exp.participant }}</td>
+        <td><span class="badge badge-neutral">{{ exp.paradigm|capitalize }}</span></td>
+        <td>{{ exp.metrics.total_trials }}</td>
+        <td>{{ (exp.metrics.accuracy * 100)|round(1) }}%</td>
+        <td>{{ (exp.metrics.corrected_hit_rate * 100)|round(1) }}%</td>
+        <td>{{ (exp.metrics.corrected_fa_rate * 100)|round(1) }}%</td>
+        <td class="cell-highlight">{{ exp.metrics.d_prime|round(3) }}</td>
+        <td>{{ exp.metrics.c|round(3) }}</td>
+        <td>{{ exp.metrics.b|round(3) }}</td>
+        <td>{{ exp.metrics.p_value|round(4) }}</td>
+        <td>
+          <a href="{{ url_for('view_report', exp_id=exp.id) }}" class="btn btn-primary btn-sm" style="display:inline-block;">Full Report &rarr;</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}
+

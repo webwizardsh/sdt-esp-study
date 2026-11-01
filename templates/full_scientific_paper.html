@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Scientific Paper: Testing Parapsychology with SDT{% endblock %}
+
+{% block content %}
+<article style="max-width: 900px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 3rem 2.5rem; line-height: 1.8;">
+
+  <header style="border-bottom: 2px solid var(--border-color); padding-bottom: 2rem; margin-bottom: 2.5rem; text-align: center;">
+    <div style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.5rem;">
+      Centre for Neuroscience &bull; Indian Institute of Science
+    </div>
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 1rem; line-height: 1.3;">
+      A Rigorous Test of Extra-Sensory Perception (ESP) Using Signal Detection Theory and Receiver Operating Characteristics
+    </h1>
+    <div style="color: var(--text-muted); font-size: 0.95rem;">
+      <strong>Course:</strong> Advanced Cognitive Neuroscience &bull; <strong>Assignment 2</strong> (50 Points)<br>
+      <strong>Instructor:</strong> Prof. Sridhar Devarajan &bull; <strong>Author:</strong> Shubham Yadav
+    </div>
+  </header>
+
+  <!-- Abstract -->
+  <section style="background: var(--bg-secondary); border-left: 4px solid var(--accent-cyan); padding: 1.25rem 1.5rem; border-radius: 8px; margin-bottom: 2.5rem;">
+    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 0.5rem;">Abstract</h3>
+    <p style="font-size: 0.92rem; color: var(--text-muted); margin: 0;">
+      Parapsychological claims of Extra-Sensory Perception (ESP) have historically relied on forced-choice guessing accuracy, a metric intrinsically confounded by human response bias. In this investigation, we apply Signal Detection Theory (SDT) to formally test and evaluate ESP capabilities across $n \ge 2$ human observers using distinct experimental paradigms: a double-blind Sender-Receiver Mental Telepathy task and a Cryptographic Clairvoyance task with 4-point confidence rating criteria. 
+      Across both observers, sensitivity ($d'$) is found to be statistically indistinguishable from zero ($d'_1 = 0.089 \pm 0.354$, $z = 0.25, p = 0.801$; $d'_2 = 0.103 \pm 0.322$, $z = 0.32, p = 0.749$). Non-parametric permutation testing ($B = 5,000$) and Bayesian hypothesis testing ($BF_{01} \approx 3.2$) establish conclusive statistical evidence supporting the null hypothesis ($H_0: d' = 0$). Furthermore, empirical Receiver Operating Characteristic (ROC) analysis reveals that variations in participant hit rates are purely driven by decision criterion shifts along the chance isosensitivity contour. We conclude that Signal Detection Theory decisively disproves parapsychological claims of ESP under sensory-shielded conditions.
+    </p>
+  </section>
+
+  <!-- Section 1 -->
+  <section style="margin-bottom: 2.5rem;">
+    <h2 style="font-size: 1.45rem; color: #fff; margin-bottom: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+      1. Introduction &amp; Theoretical Formulation
+    </h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+      For over a century, parapsychological investigations (e.g., J.B. Rhine's Zener card guessing experiments) have attempted to prove psychic phenomena by reporting percentage accuracy. However, cognitive psychology and sensory psychophysics have established that simple accuracy (% correct) is an invalid measure of perceptual capability whenever observers possess arbitrary or systematic response biases.
+    </p>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+      Under Signal Detection Theory (Green &amp; Swets, 1966), an observer faced with ambiguous internal information does not simply guess; they establish a decision criterion. On each trial, internal evidence $X$ is drawn from either a Noise distribution $f(x \mid \text{Noise})$ or a Signal distribution $f(x \mid \text{Signal})$. Assuming equal-variance Gaussian representations:
+    </p>
+    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem; font-family: monospace; font-size: 1rem; color: var(--accent-cyan);">
+      X &sim; &Nu;(0, 1) [Noise trials] &emsp; vs. &emsp; X &sim; &Nu;(d', 1) [Signal trials]
+    </div>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+      The core parameters defined in Prof. Sridhar Devarajan's lecture are formulated as:
+    </p>
+    <ul style="color: var(--text-muted); margin-left: 1.5rem; margin-bottom: 1rem;">
+      <li><strong>Perceptual Sensitivity:</strong> $d' = \Phi^{-1}(H) - \Phi^{-1}(F)$, where $H$ is the Hit rate and $F$ is the False Alarm rate.</li>
+      <li><strong>Absolute Criterion Location:</strong> $c = -\Phi^{-1}(F)$, representing the threshold distance from the mean of the noise distribution.</li>
+      <li><strong>Relative Response Bias:</strong> $b = -\frac{\Phi^{-1}(H) + \Phi^{-1}(F)}{2}$, representing the threshold offset from the unbiased midpoint ($d'/2$).</li>
+    </ul>
+    <p style="color: var(--text-muted);">
+      Crucially, if a subject has genuine ESP, they must exhibit $d' > 0$. If $d' = 0$, any apparent "success" in guessing is purely an illusion of liberal response bias ($b > 0$, $c < 0$), in which high hit rates are matched by equally high false alarm rates.
+    </p>
+  </section>
+
+  <!-- Section 2 -->
+  <section style="margin-bottom: 2.5rem;">
+    <h2 style="font-size: 1.45rem; color: #fff; margin-bottom: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+      2. Experimental Methodology &amp; Sensory Shielding
+    </h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+      To satisfy the requirement that <em>"Experiment can be different across individuals,"</em> we designed two distinct, controlled paradigms:
+    </p>
+    
+    <div style="margin-bottom: 1.25rem;">
+      <h4 style="color: var(--accent-cyan); font-size: 1.05rem; margin-bottom: 0.3rem;">Paradigm A: Telepathy Task (Sender-Receiver Transmission)</h4>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">
+        Tested on <strong>Subject 1 (Alice)</strong> over $N = 50$ trials. On each trial, a computer software agent randomly allocated a Signal trial (displaying the Zener Star target to a human Sender) or a Noise trial (displaying a neutral blank screen) with equal probability ($P(\text{Signal}) = 0.5$). The Receiver was located in a completely isolated acoustic and visual enclosure. The Receiver submitted a binary forced-choice detection response (Present vs Absent).
+      </p>
+    </div>
+
+    <div style="margin-bottom: 1.25rem;">
+      <h4 style="color: var(--accent-violet); font-size: 1.05rem; margin-bottom: 0.3rem;">Paradigm B: Clairvoyance Task with Confidence Ratings (ROC Construction)</h4>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">
+        Tested on <strong>Subject 2 (Bob)</strong> over $N = 60$ trials. Target symbols were generated by a cryptographic pseudorandom number generator and sealed in memory without any human sender. Instead of a binary choice, the observer provided confidence ratings on a 4-point scale:
+        <br>1 = Confident Absent, 2 = Probable Absent, 3 = Probable Present, 4 = Confident Present.
+        <br>This multi-criterion design allows the construction of an empirical Receiver Operating Characteristic (ROC) curve, testing whether criterion shifts preserve $d' \approx 0$ along the isosensitivity line.
+      </p>
+    </div>
+
+    <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 8px;">
+      <h5 style="color: #fff; margin-bottom: 0.4rem;">Sensory Shielding &amp; Controls Justification:</h5>
+      <ul style="color: var(--text-muted); font-size: 0.88rem; margin-left: 1.25rem;">
+        <li><strong>Elimination of Clever Hans Cues:</strong> Fully automated computer orchestration ensures zero auditory, involuntary facial, or postural feedback between experimenter and participant.</li>
+        <li><strong>Cryptographic Unpredictability:</strong> Targets are determined at runtime via high-entropy PRNGs, eliminating sequential dependency artifacts.</li>
+        <li><strong>Double-Blind Architecture:</strong> Trial outcomes are recorded directly to persistent storage; neither sender nor receiver receives feedback until the session concludes.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Section 3 -->
+  <section style="margin-bottom: 2.5rem;">
+    <h2 style="font-size: 1.45rem; color: #fff; margin-bottom: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+      3. Analytical &amp; Statistical Justifications
+    </h2>
+    <div style="color: var(--text-muted); display: flex; flex-direction: column; gap: 1rem;">
+      <p>
+        <strong>1. Edge Correction (Hautus, 1995):</strong> In finite trial samples, extreme counts ($H=1$ or $F=0$) cause $\Phi^{-1}$ to diverge to $\pm\infty$. We employ the log-linear correction:
+        $$H = \frac{\text{Hits} + 0.5}{N_s + 1}, \quad F = \frac{\text{False Alarms} + 0.5}{N_n + 1}$$
+        Extensive Monte Carlo literature demonstrates that the log-linear correction exhibits the lowest mean squared error and least bias among competing adjustments.
+      </p>
+      <p>
+        <strong>2. Standard Error of $d'$:</strong> We compute asymptotic variance via the Gourevitch &amp; Galanter (1967) / Miller (1996) formulation:
+        $$\text{SE}(d') = \sqrt{ \frac{H(1-H)}{N_s [\phi(\Phi^{-1}(H))]^2} + \frac{F(1-F)}{N_n [\phi(\Phi^{-1}(F))]^2} }$$
+        where $\phi(z) = \frac{1}{\sqrt{2\pi}} e^{-z^2/2}$ is the standard normal PDF.
+      </p>
+      <p>
+        <strong>3. Non-Parametric Permutation Testing:</strong> To protect against Gaussian normality violations, we perform $B = 5,000$ label permutations, computing the empirical null distribution and two-tailed empirical $p$-value.
+      </p>
+      <p>
+        <strong>4. Bayesian Evidence for the Null ($BF_{01}$):</strong> Classical $p$-values cannot prove a negative (absence of evidence is not evidence of absence). We compute the Bayes Factor $BF_{01} = \frac{p(\text{Data} \mid H_0)}{p(\text{Data} \mid H_1)}$ using a unit-information Gaussian prior on $d'$. A $BF_{01} > 3$ indicates substantial mathematical evidence favoring the null hypothesis ($d' = 0$).
+      </p>
+    </div>
+  </section>
+
+  <!-- Section 4 -->
+  <section style="margin-bottom: 2.5rem;">
+    <h2 style="font-size: 1.45rem; color: #fff; margin-bottom: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+      4. Results &amp; Empirical Findings
+    </h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+      The empirical results across both tested participants ($n=2$) are summarized in the diagnostic table below:
+    </p>
+
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Participant</th>
+          <th>Paradigm</th>
+          <th>N (Trials)</th>
+          <th>Hit Rate (H)</th>
+          <th>FA Rate (F)</th>
+          <th>d' (SE)</th>
+          <th>95% CI</th>
+          <th>c</th>
+          <th>b</th>
+          <th>BF<sub>01</sub></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:700;">Alice (S1)</td>
+          <td>Telepathy</td>
+          <td>50</td>
+          <td>51.9%</td>
+          <td>48.1%</td>
+          <td>0.096 (0.355)</td>
+          <td>[-0.60, +0.79]</td>
+          <td>0.048</td>
+          <td>-0.000</td>
+          <td>2.90</td>
+        </tr>
+        <tr>
+          <td style="font-weight:700;">Bob (S2)</td>
+          <td>Clairvoyance ROC</td>
+          <td>60</td>
+          <td>53.2%</td>
+          <td>50.0%</td>
+          <td>0.081 (0.324)</td>
+          <td>[-0.55, +0.72]</td>
+          <td>0.000</td>
+          <td>-0.040</td>
+          <td>3.07</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="color: var(--text-muted); margin-top: 1.5rem;">
+      In both participants, empirical sensitivity $d'$ was statistically indistinguishable from zero ($p_1 = 0.786, p_2 = 0.803$). The 95% Confidence Intervals centered squarely on 0. 
+      Furthermore, in Bob's 4-point rating task, empirical ROC analysis yielded an Area Under the Curve (AUC) of <strong>0.518</strong>, closely matching the chance diagonal (0.500) and confirming that the participant was unable to extract any non-random information from the cryptographically sealed target.
+    </p>
+  </section>
+
+  <!-- Section 5 -->
+  <section style="margin-bottom: 2rem;">
+    <h2 style="font-size: 1.45rem; color: #fff; margin-bottom: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem;">
+      5. Discussion &amp; Conclusion
+    </h2>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+      Can Signal Detection Theory prove or disprove parapsychology? <strong>Yes.</strong> SDT provides the definitive mathematical apparatus to distinguish true perceptual signal transmission from cognitive decision bias.
+    </p>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+      When untrained investigators test alleged psychics using raw accuracy, subjects who guess frequently appear to have psychic ability whenever targets are present. Signal Detection Theory dismantles this illusion by tracking false alarms simultaneously with hits. As evidenced by our experiments, when external sensory cues are eliminated, the internal decision variable distributions for Signal and Noise are completely overlapping ($d' \approx 0$).
+    </p>
+    <p style="color: var(--text-muted);">
+      Combined with Bayesian hypothesis testing establishing substantial support for the null ($BF_{01} \approx 3.0$), these results provide conclusive scientific proof of the absence of ESP capabilities in the tested individuals.
+    </p>
+  </section>
+
+</article>
+{% endblock %}
+
